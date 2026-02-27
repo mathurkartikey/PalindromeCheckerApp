@@ -1,21 +1,30 @@
-// Palindrome Service Class (Encapsulated Logic)
-class PalindromeChecker {
+import java.util.Stack;
+import java.util.Deque;
+import java.util.LinkedList;
 
-    // Public method to check palindrome
+/* Strategy Interface */
+interface PalindromeStrategy {
+    boolean checkPalindrome(String input);
+}
+
+
+/* Stack Based Strategy */
+class StackStrategy implements PalindromeStrategy {
+
     public boolean checkPalindrome(String input) {
 
-        // Normalize (case-insensitive & ignore non-alphanumeric)
         String normalized = input.toLowerCase().replaceAll("[^a-z0-9]", "");
 
-        int start = 0;
-        int end = normalized.length() - 1;
+        Stack<Character> stack = new Stack<>();
 
-        while (start < end) {
-            if (normalized.charAt(start) != normalized.charAt(end)) {
+        for (int i = 0; i < normalized.length(); i++) {
+            stack.push(normalized.charAt(i));
+        }
+
+        for (int i = 0; i < normalized.length(); i++) {
+            if (normalized.charAt(i) != stack.pop()) {
                 return false;
             }
-            start++;
-            end--;
         }
 
         return true;
@@ -23,22 +32,52 @@ class PalindromeChecker {
 }
 
 
-// Main Application Class
+/* Deque Based Strategy */
+class DequeStrategy implements PalindromeStrategy {
+
+    public boolean checkPalindrome(String input) {
+
+        String normalized = input.toLowerCase().replaceAll("[^a-z0-9]", "");
+
+        Deque<Character> deque = new LinkedList<>();
+
+        for (int i = 0; i < normalized.length(); i++) {
+            deque.addLast(normalized.charAt(i));
+        }
+
+        while (deque.size() > 1) {
+            if (deque.removeFirst() != deque.removeLast()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+
+
+/* Main Application Class */
 public class PalindromeCheckerApp {
 
     public static void main(String[] args) {
 
-        String input = "Madam In Eden Im Adam";
+        String input = "A man a plan a canal Panama";
 
-        // Create service object
-        PalindromeChecker checker = new PalindromeChecker();
+        // Choose Strategy at Runtime
+        PalindromeStrategy strategy;
 
-        boolean result = checker.checkPalindrome(input);
+        // Change this line to switch algorithms:
+        strategy = new StackStrategy();
+        // strategy = new DequeStrategy();
+
+        boolean result = strategy.checkPalindrome(input);
 
         System.out.println("======================================");
-        System.out.println("Palindrome Checker App - UC11 (OOPS)");
+        System.out.println("Palindrome Checker App - UC12");
+        System.out.println("Strategy Pattern Implementation");
         System.out.println("======================================");
         System.out.println("Given String: " + input);
+        System.out.println("Using Strategy: " + strategy.getClass().getSimpleName());
 
         if (result) {
             System.out.println("Result: The given string is a Palindrome.");
